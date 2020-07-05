@@ -5,7 +5,7 @@ const eva = new Eva(new Env({
   null: null,
   true: true,
   false: false,
-  VERSION: '0.1'
+  VERSION: '0.1',
 }))
 
 //
@@ -120,8 +120,8 @@ describe('evaluate block declaration', () => {
       ['begin',
         ['var', 'x', 10],
         ['var', 'y', 20],
-        ['+', ['*', 'x', 'y'], 30]
-      ]
+        ['+', ['*', 'x', 'y'], 30],
+      ],
     )).toEqual(230)
   })
 })
@@ -133,10 +133,10 @@ describe('evaluate nested block declaration', () => {
         ['var', 'x', 10],
         ['begin',
           ['var', 'x', 20],
-          'x'
+          'x',
         ],
-        'x'
-      ]
+        'x',
+      ],
     )).toEqual(10)
   })
 })
@@ -148,10 +148,10 @@ describe('evaluate nested block with closure', () => {
         ['var', 'y', 10],
         ['var', 'result', ['begin',
           ['var', 'x', ['+', 'y', 10]],
-          'x'
+          'x',
         ]],
-        'result'
-      ]
+        'result',
+      ],
     )).toEqual(20)
   })
 })
@@ -168,8 +168,8 @@ describe('evaluate assign declaration', () => {
         ['begin',
           ['set', 'x', 100],
         ],
-        'x'
-      ]
+        'x',
+      ],
     )).toEqual(100)
   })
 })
@@ -189,10 +189,10 @@ describe('evaluate if block', () => {
         ['if',
           ['>', 'x', 10],
           ['set', 'y', 20],
-          ['set', 'y', 30]
+          ['set', 'y', 30],
         ],
-        'y'
-      ]
+        'y',
+      ],
     )).toEqual(30)
   })
 })

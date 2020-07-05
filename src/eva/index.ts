@@ -126,7 +126,7 @@ class Eva {
   }
 
   private assignDec(exp: AssignDeclaration, env: Env): Expression {
-    const [_, name, value] = exp
+    const [_kw, name, value] = exp
     if (this.varAcc(name, env) !== value) {
       env.assign(name, this.eval(value, env))
     }
@@ -134,7 +134,7 @@ class Eva {
   }
 
   private ifDec(exp: IfDeclaration, env: Env): Expression {
-    const [_, cond, cons, alt] = exp
+    const [_kw, cond, cons, alt] = exp
     if (this.eval(cond, env)) {
       return this.eval(cons, env)
     } else {
