@@ -196,3 +196,25 @@ describe('evaluate if block', () => {
     )).toEqual(30)
   })
 })
+
+//
+// While block
+// (while <cond>
+//        <block>)
+//
+describe('evaluate while block', () => {
+  it('should return 10', () => {
+    expect(eva.eval(
+      ['begin',
+        ['var', 'counter', 0],
+        ['while',
+          ['<', 'counter', 10],
+          ['begin',
+            ['set', 'counter', ['+', 'counter', 1]],
+          ],
+        ],
+        'counter',
+      ],
+    )).toEqual(10)
+  })
+})
