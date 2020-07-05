@@ -19,7 +19,7 @@
 		"quotes": ["error", "single"],
     "semi": ["error", "never"],
     "indent": ["error", 2],
-    "comma-dangle": ["error", "only-multiline"]
+    "comma-dangle": ["error", "always-multiline"]
 	},
 	"overrides": [
 		{
