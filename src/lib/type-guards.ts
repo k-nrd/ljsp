@@ -2,12 +2,12 @@ import {
   Expression,
   List,
   NumOpExpression,
-  VarDeclaration,
+  VarExpression,
   VarName,
   EvaString,
-  BlockDeclaration,
-  AssignDeclaration,
-  IfDeclaration,
+  BlockExpression,
+  AssignExpression,
+  IfExpression,
   CompExpression,
 } from './types'
 
@@ -65,20 +65,24 @@ function isCompOp(exp: List): exp is CompExpression {
   return false
 }
 
-function isVarDeclaration(exp: List): exp is VarDeclaration {
-  return isString(exp[0]) && exp[0] === 'var'
+function isVarExpression(exp: List): exp is VarExpression {
+  return exp[0] === 'var'
 }
 
-function isBlockDeclaration(exp: List): exp is BlockDeclaration {
-  return isString(exp[0]) && exp[0] === 'begin'
+function isBlockExpression(exp: List): exp is BlockExpression {
+  return exp[0] === 'begin'
 }
 
-function isAssignDeclaration(exp: List): exp is AssignDeclaration {
-  return isString(exp[0]) && exp[0] === 'set'
+function isAssignExpression(exp: List): exp is AssignExpression {
+  return exp[0] === 'set'
 }
 
-function isIfDeclaration(exp: List): exp is IfDeclaration {
-  return isString(exp[0]) && exp[0] === 'if'
+function isIfExpression(exp: List): exp is IfExpression {
+  return exp[0] === 'if'
+}
+
+function isWhileExpression(exp: List): exp is IfExpression {
+  return exp[0] === 'while'
 }
 
 function isVarName(exp: Expression): exp is VarName {
@@ -93,9 +97,10 @@ export {
   isList,
   isNumOp,
   isCompOp,
-  isVarDeclaration,
+  isVarExpression,
   isVarName,
-  isBlockDeclaration,
-  isAssignDeclaration,
-  isIfDeclaration,
+  isBlockExpression,
+  isAssignExpression,
+  isIfExpression,
+  isWhileExpression,
 }

@@ -14,28 +14,34 @@ interface CompExpression extends List {
   2: Expression
 }
 
-interface VarDeclaration extends List {
+interface VarExpression extends List {
   0: 'var'
   1: string
   2: Expression
 }
 
-interface BlockDeclaration extends List {
+interface BlockExpression extends List {
   0: 'begin'
   [index: number]: Expression
 }
 
-interface AssignDeclaration extends List {
+interface AssignExpression extends List {
   0: 'set'
   1: string
   2: Expression
 }
 
-interface IfDeclaration extends List {
+interface IfExpression extends List {
   0: 'if'
   1: BoolExpression
   2: Expression
   3: Expression
+}
+
+interface IfExpression extends List {
+  0: 'while'
+  1: BoolExpression
+  2: BlockExpression
 }
 
 type BoolExpression = CompExpression
@@ -50,13 +56,14 @@ export {
   EvaString,
   List,
   NumOpExpression,
-  VarDeclaration,
+  VarExpression,
   NumOp,
   CompOp,
   VarName,
-  BlockDeclaration,
-  AssignDeclaration,
-  IfDeclaration,
+  BlockExpression,
+  AssignExpression,
+  IfExpression,
   BoolExpression,
   CompExpression,
+  WhileExpression,
 }

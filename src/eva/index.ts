@@ -2,11 +2,12 @@ import {
   Expression,
   NumOpExpression,
   CompExpression,
-  VarDeclaration,
+  VarExpression,
   VarName,
-  BlockDeclaration,
-  AssignDeclaration,
-  IfDeclaration,
+  BlockExpression,
+  AssignExpression,
+  IfExpression,
+  WhileExpression,
 } from '../lib/types'
 
 import {
@@ -15,11 +16,12 @@ import {
   isEvaString,
   isNumOp,
   isCompOp,
-  isVarDeclaration,
+  isVarExpression,
   isVarName,
-  isBlockDeclaration,
-  isAssignDeclaration,
-  isIfDeclaration,
+  isBlockExpression,
+  isAssignExpression,
+  isIfExpression,
+  isWhileExpression,
 } from '../lib/type-guards'
 
 import Env from './env'
@@ -41,17 +43,19 @@ class Eva {
       return this.numOp(exp, env)
     } else if (isCompOp(exp)) {
       return this.compOp(exp, env)
-    } else if (isVarDeclaration(exp)) {
-      return this.varDec(exp, env)
+    } else if (isVarExpression(exp)) {
+      return this.varExp(exp, env)
     } else if (isVarName(exp)) {
       return this.varAcc(exp, env)
-    } else if (isBlockDeclaration(exp)) {
+    } else if (isBlockExpression(exp)) {
       const blockEnv = new Env({}, env)
-      return this.blockDec(exp, blockEnv)
-    } else if (isAssignDeclaration(exp)) {
-      return this.assignDec(exp, env)
-    } else if (isIfDeclaration(exp)) {
-      return this.ifDec(exp, env)
+      return this.blockExp(exp, blockEnv)
+    } else if (isAssignExpression(exp)) {
+      return this.assignExp(exp, env)
+    } else if (isIfExpression(exp)) {
+      return this.ifExp(exp, env)
+    } else if (isWhileExpression(exp)) {
+      return this.whileExp(exp, env)
     }
     throw `Unimplemented: ${JSON.stringify(exp)}`
   }
@@ -100,7 +104,7 @@ class Eva {
     }
   }
 
-  private varDec(exp: VarDeclaration, env: Env): Expression {
+  private varExp(exp: VarExpression, env: Env): Expression {
     const [_, name, value] = exp
     if (isVarName(name)) {
       return env.define(name, this.eval(value, env))
@@ -113,7 +117,7 @@ class Eva {
     return env.lookup(name)
   }
 
-  private blockDec(exp: BlockDeclaration, env: Env): Expression {
+  private blockExp(exp: BlockExpression, env: Env): Expression {
     const [_, ...exps] = exp
     let result
     exps.forEach((exp: Expression) => {
@@ -125,21 +129,33 @@ class Eva {
     return result
   }
 
-  private assignDec(exp: AssignDeclaration, env: Env): Expression {
-    const [_kw, name, value] = exp
+  private assignExp(exp: AssignExpression, env: Env): Expression {
+    const [_, name, value] = exp
     if (this.varAcc(name, env) !== value) {
       env.assign(name, this.eval(value, env))
     }
     return value
   }
 
-  private ifDec(exp: IfDeclaration, env: Env): Expression {
-    const [_kw, cond, cons, alt] = exp
+  private ifExp(exp: IfExpression, env: Env): Expression {
+    const [_, cond, cons, alt] = exp
     if (this.eval(cond, env)) {
       return this.eval(cons, env)
     } else {
       return this.eval(alt, env)
     }
+  }
+
+  private whileExp(exp: WhileExpression, env: Env): Expression {
+    const [_, cond, block] = exp
+    let result
+    while (this.eval(cond, env)) {
+      result = this.eval(block, env)
+    }
+    if (result == null) {
+      throw `Undefined while declaration: ${JSON.stringify(exp)}`
+    }
+    return result
   }
 }
 
