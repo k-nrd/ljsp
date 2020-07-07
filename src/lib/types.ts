@@ -1,18 +1,7 @@
-type Expression = number | string | boolean | List
+type Expression = number | string | boolean | function | List
 type EvaString = string
 
 type List = Expression[]
-
-interface NumOpExpression extends List {
-  0: NumOp
-  [index: number]: Expression
-}
-
-interface CompExpression extends List {
-  0: CompOp
-  1: Expression
-  2: Expression
-}
 
 interface VarExpression extends List {
   0: 'var'
@@ -38,16 +27,16 @@ interface IfExpression extends List {
   3: Expression
 }
 
-interface IfExpression extends List {
+interface WhileExpression extends List {
   0: 'while'
-  1: BoolExpression
+  1: Expression
   2: BlockExpression
 }
 
-type BoolExpression = CompExpression
-
-type NumOp = '+' | '*' | '-' | '/'
-type CompOp = '<' | '>' | '<=' | '>=' | '==' | '!='
+interface FunctionCall extends List {
+  0: VarName
+  [index: number]: Expression
+}
 
 type VarName = string
 
@@ -55,15 +44,11 @@ export {
   Expression,
   EvaString,
   List,
-  NumOpExpression,
   VarExpression,
-  NumOp,
-  CompOp,
   VarName,
   BlockExpression,
   AssignExpression,
   IfExpression,
-  BoolExpression,
-  CompExpression,
   WhileExpression,
+  FunctionCall,
 }

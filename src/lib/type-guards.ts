@@ -1,14 +1,14 @@
 import {
   Expression,
   List,
-  NumOpExpression,
   VarExpression,
   VarName,
   EvaString,
   BlockExpression,
   AssignExpression,
   IfExpression,
-  CompExpression,
+  WhileExpression,
+  FunctionCall,
 } from './types'
 
 function isNumber(exp: Expression): exp is number {
@@ -31,40 +31,6 @@ function isList(exp: Expression): exp is List {
   return Array.isArray(exp)
 }
 
-function isNumOp(exp: List): exp is NumOpExpression {
-  if (isString(exp[0])) {
-    const OPS: {
-      [k: string]: boolean
-    } = {
-      '+': true,
-      '-': true,
-      '*': true,
-      '/': true,
-    }
-
-    return OPS[exp[0]] || false
-  }
-  return false
-}
-
-function isCompOp(exp: List): exp is CompExpression {
-  if (isString(exp[0])) {
-    const OPS: {
-      [k: string]: boolean
-    } = {
-      '<': true,
-      '>': true,
-      '<=': true,
-      '>=': true,
-      '==': true,
-      '!=': true,
-    }
-
-    return OPS[exp[0]] || false
-  }
-  return false
-}
-
 function isVarExpression(exp: List): exp is VarExpression {
   return exp[0] === 'var'
 }
@@ -81,12 +47,16 @@ function isIfExpression(exp: List): exp is IfExpression {
   return exp[0] === 'if'
 }
 
-function isWhileExpression(exp: List): exp is IfExpression {
+function isWhileExpression(exp: List): exp is WhileExpression {
   return exp[0] === 'while'
 }
 
+function isFunctionCall(exp: List): exp is FunctionCall {
+  return isVarName(exp[0])
+}
+
 function isVarName(exp: Expression): exp is VarName {
-  return isString(exp) && /^[a-zA-Z][a-zA-Z0-9_]*$/.test(exp)
+  return isString(exp) && /^[+\-*/<>=a-zA-Z][a-zA-Z0-9_]*$/.test(exp)
 }
 
 export {
@@ -95,12 +65,11 @@ export {
   isBool,
   isEvaString,
   isList,
-  isNumOp,
-  isCompOp,
   isVarExpression,
   isVarName,
   isBlockExpression,
   isAssignExpression,
   isIfExpression,
   isWhileExpression,
+  isFunctionCall,
 }

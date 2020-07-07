@@ -1,34 +1,51 @@
 import {
   Expression,
-  NumOpExpression,
-  CompExpression,
   VarExpression,
   VarName,
   BlockExpression,
   AssignExpression,
   IfExpression,
   WhileExpression,
+  FunctionCall,
 } from '../lib/types'
 
 import {
   isNumber,
   isBool,
   isEvaString,
-  isNumOp,
-  isCompOp,
   isVarExpression,
   isVarName,
   isBlockExpression,
   isAssignExpression,
   isIfExpression,
   isWhileExpression,
+  isFunctionCall,
 } from '../lib/type-guards'
 
 import Env from './env'
 
+const GlobalEnvironment = new Env({
+  null: null,
+  true: true,
+  false: false,
+  VERSION: '0.1',
+  '+': (op1: number, op2: number): number => op1+op2,
+  '-': (op1: number, op2?: number): number => (op2 == null) ? -op1 : op1 - op2,
+  '*': (op1: number, op2: number): number => op1*op2,
+  '/': (op1: number, op2: number): number => op1/op2,
+  '>': (op1: number, op2: number): boolean => op1 > op2,
+  '<': (op1: number, op2: number): boolean => op1 < op2,
+  '>=': (op1: number, op2: number): boolean => op1 >= op2,
+  '<=': (op1: number, op2: number): boolean => op1 <= op2,
+  '==': (op1: number, op2: number): boolean => op1 === op2,
+  '!=': (op1: number, op2: number): boolean => op1 !== op2,
+  // eslint-disable-next-line
+  print: (...args: any[]) => console.log(...args),
+})
+
 class Eva {
   global: Env
-  constructor(global = new Env()) {
+  constructor(global = GlobalEnvironment) {
     this.global = global
   }
 
@@ -39,10 +56,6 @@ class Eva {
       return exp
     } else if (isEvaString(exp)) {
       return exp.slice(1, -1)
-    } else if (isNumOp(exp)) {
-      return this.numOp(exp, env)
-    } else if (isCompOp(exp)) {
-      return this.compOp(exp, env)
     } else if (isVarExpression(exp)) {
       return this.varExp(exp, env)
     } else if (isVarName(exp)) {
@@ -56,52 +69,10 @@ class Eva {
       return this.ifExp(exp, env)
     } else if (isWhileExpression(exp)) {
       return this.whileExp(exp, env)
+    } else if (isFunctionCall(exp)) {
+      return this.functionCall(exp, env)
     }
     throw `Unimplemented: ${JSON.stringify(exp)}`
-  }
-
-  private numOp(exp: NumOpExpression, env: Env): number {
-    const [op, x, y] = [
-      exp[0] as string,
-      this.eval(exp[1], env) as number,
-      this.eval(exp[2], env) as number,
-    ]
-
-    if (op === '+') {
-      return x + y
-    } else if (op === '*') {
-      return x * y
-    } else if (op === '-') {
-      return x - y
-    } else if (op === '/') {
-      return x / y
-    } else {
-      throw `Unimplemented: ${JSON.stringify(exp)}`
-    }
-  }
-
-  private compOp(exp: CompExpression, env: Env): boolean {
-    const [op, x, y] = [
-      exp[0] as string,
-      this.eval(exp[1], env) as number,
-      this.eval(exp[2], env) as number,
-    ]
-
-    if (op === '==') {
-      return x === y
-    } else if (op === '!=') {
-      return x !== y
-    } else if (op === '<') {
-      return x < y
-    } else if (op === '>') {
-      return x > y
-    } else if (op === '>=') {
-      return x >= y
-    } else if (op === '<=') {
-      return x <= y
-    } else {
-      throw `Unimplemented: ${JSON.stringify(exp)}`
-    }
   }
 
   private varExp(exp: VarExpression, env: Env): Expression {
@@ -156,6 +127,17 @@ class Eva {
       throw `Undefined while declaration: ${JSON.stringify(exp)}`
     }
     return result
+  }
+
+  private functionCall(exp: FunctionCall, env: Env): Expression {
+    const fn = this.eval(exp[0], env)
+    const args = exp.slice(1).map(arg => this.eval(arg, env))
+
+    if (typeof fn === 'function') {
+      return fn(...args)
+    }
+
+    //TODO user defined funcs
   }
 }
 
