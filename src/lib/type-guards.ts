@@ -1,14 +1,8 @@
 import {
   Expression,
   List,
-  VarExpression,
   VarName,
   EvaString,
-  BlockExpression,
-  AssignExpression,
-  IfExpression,
-  WhileExpression,
-  FunctionCall,
 } from './types'
 
 function isNumber(exp: Expression): exp is number {
@@ -27,36 +21,48 @@ function isEvaString(exp: Expression): exp is EvaString {
   return isString(exp) && exp[0] === '"' && exp.slice(-1) === '"'
 }
 
+function isVarName(exp: Expression): exp is VarName {
+  return isString(exp) && /^[+\-=*/<>a-zA-Z]+[a-zA-Z0-9_]*$/.test(exp)
+}
+
 function isList(exp: Expression): exp is List {
   return Array.isArray(exp)
 }
 
-function isVarExpression(exp: List): exp is VarExpression {
+function isVarExpression(exp: List): boolean {
   return exp[0] === 'var'
 }
 
-function isBlockExpression(exp: List): exp is BlockExpression {
+function isBlockExpression(exp: List): boolean {
   return exp[0] === 'begin'
 }
 
-function isAssignExpression(exp: List): exp is AssignExpression {
+function isAssignExpression(exp: List): boolean {
   return exp[0] === 'set'
 }
 
-function isIfExpression(exp: List): exp is IfExpression {
+function isIfExpression(exp: List): boolean {
   return exp[0] === 'if'
 }
 
-function isWhileExpression(exp: List): exp is WhileExpression {
+function isSwitchExpression(exp: List): boolean {
+  return exp[0] === 'switch'
+}
+
+function isWhileExpression(exp: List): boolean {
   return exp[0] === 'while'
 }
 
-function isFunctionCall(exp: List): exp is FunctionCall {
-  return isVarName(exp[0])
+function isDefExpression(exp: List): boolean {
+  return exp[0] === 'def'
 }
 
-function isVarName(exp: Expression): exp is VarName {
-  return isString(exp) && /^[+\-*/<>=a-zA-Z][a-zA-Z0-9_]*$/.test(exp)
+function isLambdaExpression(exp: List): boolean {
+  return exp[0] === 'lambda'
+}
+
+function isFunctionCall(exp: List): boolean {
+  return isVarName(exp[0])
 }
 
 export {
@@ -72,4 +78,7 @@ export {
   isIfExpression,
   isWhileExpression,
   isFunctionCall,
+  isDefExpression,
+  isLambdaExpression,
+  isSwitchExpression,
 }

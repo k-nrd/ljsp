@@ -1,12 +1,7 @@
 import {
   Expression,
-  VarExpression,
   VarName,
-  BlockExpression,
-  AssignExpression,
-  IfExpression,
-  WhileExpression,
-  FunctionCall,
+  List,
 } from '../lib/types'
 
 import {
@@ -19,34 +14,22 @@ import {
   isAssignExpression,
   isIfExpression,
   isWhileExpression,
-  isFunctionCall,
+  isList,
+  isDefExpression,
+  isLambdaExpression,
+  isSwitchExpression,
 } from '../lib/type-guards'
 
 import Env from './env'
-
-const GlobalEnvironment = new Env({
-  null: null,
-  true: true,
-  false: false,
-  VERSION: '0.1',
-  '+': (op1: number, op2: number): number => op1+op2,
-  '-': (op1: number, op2?: number): number => (op2 == null) ? -op1 : op1 - op2,
-  '*': (op1: number, op2: number): number => op1*op2,
-  '/': (op1: number, op2: number): number => op1/op2,
-  '>': (op1: number, op2: number): boolean => op1 > op2,
-  '<': (op1: number, op2: number): boolean => op1 < op2,
-  '>=': (op1: number, op2: number): boolean => op1 >= op2,
-  '<=': (op1: number, op2: number): boolean => op1 <= op2,
-  '==': (op1: number, op2: number): boolean => op1 === op2,
-  '!=': (op1: number, op2: number): boolean => op1 !== op2,
-  // eslint-disable-next-line
-  print: (...args: any[]) => console.log(...args),
-})
+import GlobalEnvironment from './global'
+import Transformer from './transformer'
 
 class Eva {
   global: Env
+  private transformer: Transformer
   constructor(global = GlobalEnvironment) {
     this.global = global
+    this.transformer = new Transformer()
   }
 
   public eval(exp: Expression, env: Env = this.global): Expression {
@@ -67,15 +50,21 @@ class Eva {
       return this.assignExp(exp, env)
     } else if (isIfExpression(exp)) {
       return this.ifExp(exp, env)
+    } else if (isSwitchExpression(exp)) {
+      return this.eval(this.transformer.switchToIf(exp), env)
     } else if (isWhileExpression(exp)) {
       return this.whileExp(exp, env)
-    } else if (isFunctionCall(exp)) {
+    } else if (isDefExpression(exp)) {
+      return this.eval(this.transformer.defToLambda(exp), env)
+    } else if (isLambdaExpression(exp)) {
+      return this.lambdaExp(exp, env)
+    } else if (isList(exp)) {
       return this.functionCall(exp, env)
     }
     throw `Unimplemented: ${JSON.stringify(exp)}`
   }
 
-  private varExp(exp: VarExpression, env: Env): Expression {
+  private varExp(exp: List, env: Env): Expression {
     const [_, name, value] = exp
     if (isVarName(name)) {
       return env.define(name, this.eval(value, env))
@@ -88,7 +77,7 @@ class Eva {
     return env.lookup(name)
   }
 
-  private blockExp(exp: BlockExpression, env: Env): Expression {
+  private blockExp(exp: List, env: Env): Expression {
     const [_, ...exps] = exp
     let result
     exps.forEach((exp: Expression) => {
@@ -100,7 +89,7 @@ class Eva {
     return result
   }
 
-  private assignExp(exp: AssignExpression, env: Env): Expression {
+  private assignExp(exp: List, env: Env): Expression {
     const [_, name, value] = exp
     if (this.varAcc(name, env) !== value) {
       env.assign(name, this.eval(value, env))
@@ -108,7 +97,7 @@ class Eva {
     return value
   }
 
-  private ifExp(exp: IfExpression, env: Env): Expression {
+  private ifExp(exp: List, env: Env): Expression {
     const [_, cond, cons, alt] = exp
     if (this.eval(cond, env)) {
       return this.eval(cons, env)
@@ -117,7 +106,24 @@ class Eva {
     }
   }
 
-  private whileExp(exp: WhileExpression, env: Env): Expression {
+  private lambdaExp(exp: List, env: Env): Expression {
+    const [_, params, body] = exp
+    const validParams = params.reduce(
+      (acc: boolean, p: Expression) => acc && isVarName(p), true,
+    )
+
+    if (!validParams) {
+      throw `Invalid parameter name: ${params}`
+    } else {
+      return {
+        params,
+        body,
+        env,
+      }
+    }
+  }
+
+  private whileExp(exp: List, env: Env): Expression {
     const [_, cond, block] = exp
     let result
     while (this.eval(cond, env)) {
@@ -129,15 +135,20 @@ class Eva {
     return result
   }
 
-  private functionCall(exp: FunctionCall, env: Env): Expression {
+  private functionCall(exp: List, env: Env): Expression {
     const fn = this.eval(exp[0], env)
     const args = exp.slice(1).map(arg => this.eval(arg, env))
 
     if (typeof fn === 'function') {
       return fn(...args)
+    } else if (typeof fn === 'object') {
+      const activationRecord: { [k: string]: Expression } = {}
+      fn.params.forEach((p: VarName, idx: number) => {
+        activationRecord[p] = args[idx]
+      })
+      const activationEnv = new Env(activationRecord, fn.env)
+      return this.eval(fn.body, activationEnv)
     }
-
-    //TODO user defined funcs
   }
 }
 
