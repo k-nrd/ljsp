@@ -35,6 +35,26 @@ class Transformer {
 
     return ifExp
   }
+
+  whileToFor(exp: List): Expression {
+    const [_, init, cond, mod, body] = exp
+
+    return ['begin', init, ['while', cond, ['begin', body, mod]], body]
+  }
+
+  opToAssign(exp: List): Expression {
+    const [op, name] = exp
+
+    switch (op) {
+    case '++':
+      return ['set', name, ['+', name, 1]]
+    case '--':
+      return ['set', name, ['-', name, 1]]
+    default:
+      throw `Unimplemented assignment operation: ${op}.`
+    }
+    
+  }
 }
 
 export default Transformer

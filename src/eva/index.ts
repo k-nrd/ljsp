@@ -18,6 +18,12 @@ import {
   isDefExpression,
   isLambdaExpression,
   isSwitchExpression,
+  isForExpression,
+  isAssignOp,
+  isClassExpression,
+  isNewExpression,
+  isPropExpression,
+  isSuperExpression,
 } from '../lib/type-guards'
 
 import Env from './env'
@@ -44,24 +50,39 @@ class Eva {
     } else if (isVarName(exp)) {
       return this.varAcc(exp, env)
     } else if (isBlockExpression(exp)) {
-      const blockEnv = new Env({}, env)
-      return this.blockExp(exp, blockEnv)
+      return this.blockExp(exp, new Env({}, env))
     } else if (isAssignExpression(exp)) {
       return this.assignExp(exp, env)
+    } else if (isAssignOp(exp)) {
+      return this.eval(this.transformer.opToAssign(exp), env)
     } else if (isIfExpression(exp)) {
       return this.ifExp(exp, env)
     } else if (isSwitchExpression(exp)) {
       return this.eval(this.transformer.switchToIf(exp), env)
     } else if (isWhileExpression(exp)) {
       return this.whileExp(exp, env)
+    } else if (isForExpression(exp)) {
+      return this.eval(this.transformer.whileToFor(exp), env)
     } else if (isDefExpression(exp)) {
       return this.eval(this.transformer.defToLambda(exp), env)
     } else if (isLambdaExpression(exp)) {
       return this.lambdaExp(exp, env)
+    } else if (isClassExpression(exp)) {
+      return this.classExp(exp, env)
+    } else if (isNewExpression(exp)) {
+      return this.newExp(exp, env)
+    } else if (isPropExpression(exp)) {
+      return this.propExp(exp, env)
+    } else if (isSuperExpression(exp)) {
+      return this.superExp(exp, env)
     } else if (isList(exp)) {
       return this.functionCall(exp, env)
     }
     throw `Unimplemented: ${JSON.stringify(exp)}`
+  }
+
+  public run(...exps: List): Expression {
+    return this.blockExp(['block', ...exps], this.global)
   }
 
   private varExp(exp: List, env: Env): Expression {
@@ -78,23 +99,24 @@ class Eva {
   }
 
   private blockExp(exp: List, env: Env): Expression {
-    const [_, ...exps] = exp
     let result
+    const [_, ...exps] = exp
     exps.forEach((exp: Expression) => {
       result = this.eval(exp, env)
     })
-    if (result == null) {
-      throw `Undefined block declaration: ${JSON.stringify(exp)}`
-    }
     return result
   }
 
   private assignExp(exp: List, env: Env): Expression {
-    const [_, name, value] = exp
-    if (this.varAcc(name, env) !== value) {
-      env.assign(name, this.eval(value, env))
+    const [_, ref, value] = exp
+    if (isPropExpression(ref)) {
+      const [_, instance, propName] = ref
+      const instanceEnv = this.eval(instance, env)
+      return instanceEnv.define(propName, this.eval(value, env))
+    } else if (this.varAcc(ref, env) !== value) {
+      env.assign(ref, this.eval(value, env))
     }
-    return value
+    return this.eval(value, env)
   }
 
   private ifExp(exp: List, env: Env): Expression {
@@ -142,13 +164,57 @@ class Eva {
     if (typeof fn === 'function') {
       return fn(...args)
     } else if (typeof fn === 'object') {
-      const activationRecord: { [k: string]: Expression } = {}
-      fn.params.forEach((p: VarName, idx: number) => {
-        activationRecord[p] = args[idx]
-      })
-      const activationEnv = new Env(activationRecord, fn.env)
-      return this.eval(fn.body, activationEnv)
+      return this.callUserDefinedFn(fn, args)
     }
+  }
+
+  private callUserDefinedFn(fn: Record<string, Expression>, args: List): Expression {
+    const activationRecord: { [k: string]: Expression } = {}
+    fn.params.forEach((p: VarName, idx: number) => {
+      activationRecord[p] = args[idx]
+    })
+    const activationEnv = new Env(activationRecord, fn.env)
+    return this.eval(fn.body, activationEnv)
+  }
+
+  private classExp(exp: List, env: Env): Expression {
+    const [_, name, parent, body] = exp
+
+    // Class is an environment with access to parent env
+    const parentEnv = this.eval(parent, env) || env
+    const classEnv = new Env({}, parentEnv)
+  
+    // Its body is evaluated on its env
+    this.blockExp(body, classEnv)
+
+    // It is accessible by name in the parent env
+    return env.define(name, classEnv)
+  }
+
+  private newExp(exp: List, env: Env): Expression {
+    const classEnv = this.eval(exp[1], env)
+    const instanceEnv = new Env({}, classEnv)
+    const args = exp
+      .slice(2)
+      .map(arg => this.eval(arg, env))
+
+    this.callUserDefinedFn(
+      classEnv.lookup('constructor'), 
+      [instanceEnv, ...args],
+    )
+
+    return instanceEnv
+  }
+
+  private propExp(exp: Expression, env: Env): Expression {
+    const [_, instance, name] = exp
+    const instanceEnv = this.eval(instance, env)
+    return instanceEnv.lookup(name)
+  }
+
+  private superExp(exp: Expression, env: Env): Expression {
+    const [_, className] = exp
+    return this.eval(className, env).parent
   }
 }
 

@@ -6,35 +6,31 @@ import { eva, e } from './tests.setup'
 // (x)
 //
 test('evaluate variable declaration', () => {
-  expect(eva.eval(e`(var x 10)`)).toEqual(10)
-})
-
-test('evaluate variable lookup', () => {
-  expect(eva.eval('x')).toEqual(10)
+  expect(eva.run(e`(var x 10)`)).toEqual(10)
 })
 
 test('evaluate variable declaration (string)', () => {
-  expect(eva.eval(['var', 'y', '"Hello, Eva!"'])).toEqual('Hello, Eva!')
+  expect(eva.run(['var', 'y', '"Hello, Eva!"'])).toEqual('Hello, Eva!')
 })
 
 test('evaluate builtin variable null', () => {
-  expect(eva.eval('null')).toBeNull()
+  expect(eva.run('null')).toBeNull()
 })
 
 test('evaluate builtin variable true', () => {
-  expect(eva.eval('true')).toEqual(true)
+  expect(eva.run('true')).toEqual(true)
 })
 
 test('evaluate builtin variable false', () => {
-  expect(eva.eval('false')).toEqual(false)
+  expect(eva.run('false')).toEqual(false)
 })
 
 test('evaluate builtin variable VERSION', () => {
-  expect(eva.eval('VERSION')).toEqual('0.1')
+  expect(eva.run('VERSION')).toEqual('0.1')
 })
 
 test('evaluate nested var declaration', () => {
-  expect(eva.eval(['var', 'z', ['+', 3, 4]])).toEqual(7)
+  expect(eva.run(['var', 'z', ['+', 3, 4]])).toEqual(7)
 })
 
 //
@@ -42,12 +38,11 @@ test('evaluate nested var declaration', () => {
 // (set x <value>)
 //
 test('evaluate assign declaration', () => {
-  expect(eva.eval(e`
-  (begin
+  expect(eva.run(e`
       (var x 10)
       (begin
           (set x 100))
-      x)
+      x
   `,
   )).toEqual(100)
 })
