@@ -5,87 +5,95 @@ import {
   EvaString,
 } from './types'
 
-function isNumber(exp: Expression): exp is number {
+function isNumber (exp: Expression): exp is number {
   return typeof exp === 'number'
 }
 
-function isBool(exp: Expression): exp is boolean {
+function isBool (exp: Expression): exp is boolean {
   return typeof exp === 'boolean'
 }
 
-function isString(exp: Expression): exp is string {
+function isString (exp: Expression): exp is string {
   return typeof exp === 'string'
 }
 
-function isEvaString(exp: Expression): exp is EvaString {
+function isEvaString (exp: Expression): exp is EvaString {
   return isString(exp) && exp[0] === '"' && exp.slice(-1) === '"'
 }
 
-function isVarName(exp: Expression): exp is VarName {
+function isVarName (exp: Expression): exp is VarName {
   return isString(exp) && /^[+\-=*/<>a-zA-Z]+[a-zA-Z0-9_]*$/.test(exp)
 }
 
-function isList(exp: Expression): exp is List {
+function isList (exp: Expression): exp is List {
   return Array.isArray(exp)
 }
 
-function isVarExpression(exp: List): boolean {
+function isVarExpression (exp: List): boolean {
   return exp[0] === 'var'
 }
 
-function isBlockExpression(exp: List): boolean {
+function isBlockExpression (exp: List): boolean {
   return exp[0] === 'begin'
 }
 
-function isAssignExpression(exp: List): boolean {
+function isAssignExpression (exp: List): boolean {
   return exp[0] === 'set'
 }
 
-function isIfExpression(exp: List): boolean {
+function isIfExpression (exp: List): boolean {
   return exp[0] === 'if'
 }
 
-function isSwitchExpression(exp: List): boolean {
+function isSwitchExpression (exp: List): boolean {
   return exp[0] === 'switch'
 }
 
-function isWhileExpression(exp: List): boolean {
+function isWhileExpression (exp: List): boolean {
   return exp[0] === 'while'
 }
 
-function isForExpression(exp: List): boolean {
+function isForExpression (exp: List): boolean {
   return exp[0] === 'for'
 }
 
-function isDefExpression(exp: List): boolean {
+function isDefExpression (exp: List): boolean {
   return exp[0] === 'def'
 }
 
-function isLambdaExpression(exp: List): boolean {
+function isLambdaExpression (exp: List): boolean {
   return exp[0] === 'lambda'
 }
 
-function isClassExpression(exp: List): boolean {
+function isClassExpression (exp: List): boolean {
   return exp[0] === 'class'
 }
 
-function isNewExpression(exp: List): boolean {
+function isNewExpression (exp: List): boolean {
   return exp[0] === 'new'
 }
 
-function isPropExpression(exp: List): boolean {
+function isPropExpression (exp: List): boolean {
   return exp[0] === 'prop'
 }
 
-function isSuperExpression(exp: List): boolean {
+function isSuperExpression (exp: List): boolean {
   return exp[0] === 'super'
 }
 
-function isAssignOp(exp: List): boolean {
+function isModuleExpression (exp: List): boolean {
+  return exp[0] === 'module'
+}
+
+function isImportExpression (exp: List): boolean {
+  return exp[0] === 'import'
+}
+
+function isAssignOp (exp: List): boolean {
   return exp[0] === '++' || exp[0] === '--'
 }
 
-function isFunctionCall(exp: List): boolean {
+function isFunctionCall (exp: List): boolean {
   return isVarName(exp[0])
 }
 
@@ -111,4 +119,6 @@ export {
   isNewExpression,
   isPropExpression,
   isSuperExpression,
+  isModuleExpression,
+  isImportExpression
 }

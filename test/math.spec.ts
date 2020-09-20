@@ -1,4 +1,4 @@
-import { eva, e } from './tests.setup'
+import { eva, e } from './setup'
 
 //
 // Math ops

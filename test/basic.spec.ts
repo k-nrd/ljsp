@@ -1,4 +1,4 @@
-import { eva } from './tests.setup'
+import { eva } from './setup'
 
 //
 // Basic types

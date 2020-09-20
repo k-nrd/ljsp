@@ -1,4 +1,4 @@
-import { eva, e } from './tests.setup'
+import { eva, e } from './setup'
 
 test('evaluate for expression', () => {
   expect(eva.eval(e`

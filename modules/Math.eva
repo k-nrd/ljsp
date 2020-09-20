@@ -1,0 +1,9 @@
+(def abs x
+  (if (< x 0)
+      (- x)
+      x))
+
+(def square x
+  (* x x))
+
+(var MAX_VALUE 1000)
