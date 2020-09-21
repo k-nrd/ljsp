@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "transpile": "babel ./src --out-dir dist",
+    "build": "yarn clean && yarn transpile"
+  },
   "devDependencies": {
     "@babel/preset-env": "^7.11.5",
     "babel-jest": "^26.3.0",
@@ -10,6 +16,10 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^23.17.1",
     "jest": "^26.1.0",
+    "rimraf": "^3.0.2",
     "syntax-cli": "^0.1.13"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.11.6"
   }
 }

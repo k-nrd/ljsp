@@ -22,15 +22,15 @@ import {
   isImportExpression,
 } from '../lib/expressions'
 
+import { defToLambda, switchToIf, whileToFor, opToAssign } from './transformers'
+
 import createEnv from './env'
 import GlobalEnvironment from './global'
-import Transformer from './transformer'
 import * as Parser from '../parser/ljsp-parser'
 import * as fs from 'fs'
 
 export default function createLjsp(g = GlobalEnvironment) {
   const global = g
-  const transformer = new Transformer()
 
   function evaluate (exp, env = global) {
     if (isNumber(exp) || isBool(exp)) {
@@ -46,17 +46,17 @@ export default function createLjsp(g = GlobalEnvironment) {
     } else if (isAssignExpression(exp)) {
       return assignExp(exp, env)
     } else if (isAssignOp(exp)) {
-      return evaluate(transformer.opToAssign(exp), env)
+      return evaluate(opToAssign(exp), env)
     } else if (isIfExpression(exp)) {
       return ifExp(exp, env)
     } else if (isSwitchExpression(exp)) {
-      return evaluate(transformer.switchToIf(exp), env)
+      return evaluate(switchToIf(exp), env)
     } else if (isWhileExpression(exp)) {
       return whileExp(exp, env)
     } else if (isForExpression(exp)) {
-      return evaluate(transformer.whileToFor(exp), env)
+      return evaluate(whileToFor(exp), env)
     } else if (isDefExpression(exp)) {
-      return evaluate(transformer.defToLambda(exp), env)
+      return evaluate(defToLambda(exp), env)
     } else if (isLambdaExpression(exp)) {
       return lambdaExp(exp, env)
     } else if (isClassExpression(exp)) {
@@ -68,7 +68,7 @@ export default function createLjsp(g = GlobalEnvironment) {
     } else if (isModuleExpression(exp)) {
       return moduleExp(exp, env)
     } else if (isImportExpression(exp)) {
-      return importExp(exp, env)
+      return importExp(exp)
     } else if (isSuperExpression(exp)) {
       return superExp(exp, env)
     } else if (isList(exp)) {
@@ -222,7 +222,7 @@ export default function createLjsp(g = GlobalEnvironment) {
     return env.define(name, moduleEnv)
   }
 
-  function importExp (exp, _) {
+  function importExp (exp) {
     const [, name] = exp
     const moduleSrc = fs.readFileSync(`./modules/${name}.ljsp`, 'utf-8')
     const body = Parser.parse(`(begin ${moduleSrc})`)
@@ -235,10 +235,10 @@ export default function createLjsp(g = GlobalEnvironment) {
     return evaluate(className, env).parent
   }
 
-  return {
+  return Object.freeze({
     global,
     evaluate,
     run,
-  }
+  })
 }
 

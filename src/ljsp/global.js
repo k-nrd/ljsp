@@ -1,6 +1,6 @@
-import Env from './env'
+import createEnv from './env'
 
-const GlobalEnvironment = new Env({
+const GlobalEnvironment = createEnv({
   null: null,
   true: true,
   false: false,
@@ -15,7 +15,6 @@ const GlobalEnvironment = new Env({
   '<=': (op1, op2) => op1 <= op2,
   '==': (op1, op2) => op1 === op2,
   '!=': (op1, op2) => op1 !== op2,
-  // eslint-disable-next-line
   print: (...args) => console.log(...args),
 })
 
