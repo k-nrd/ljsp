@@ -3,12 +3,11 @@
 
 const fs = require('fs')
 const Parser = require('../dist/parser/ljsp-parser')
-const Ljsp = require('../dist/ljsp')
 
 function main(argv) {
   const [_node, _path, mode, exp] = argv
   
-  const ljsp = Ljsp.default()
+  const ljsp = require('../dist/ljsp').default()
 
   if (mode === '-e') {
     return ljsp.evaluate(Parser.parse(`(begin ${exp})`))
