@@ -1,4 +1,3 @@
-(begin
-  (def square (x) (* x x))
-  (var y (square 13))
-  (print y))
+(def square (x) (* x x))
+(var y (square 13))
+(print y)
