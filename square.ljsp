@@ -1,0 +1,7 @@
+(import Math)
+(var y ((prop Math square) 13))
+(print y)
+
+(var square (prop Math square))
+(var z (square 11))
+(print z)
