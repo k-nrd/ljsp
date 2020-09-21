@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+'use strict'
+
+const fs = require('fs')
+const Parser = require('../dist/parser/ljsp-parser')
+const Ljsp = require('../dist/ljsp')
+
+function main(argv) {
+  const [_node, _path, mode, exp] = argv
+  
+  const ljsp = Ljsp.default()
+
+  if (mode === '-e') {
+    return ljsp.evaluate(Parser.parse(`(begin ${exp})`))
+  }
+
+  if (mode === '-f') {
+    const src = fs.readFileSync(mode, 'utf-8')
+    return ljsp.evaluate(Parser.parse(`(begin ${src})`))
+  }
+}
+
+main(process.argv)
