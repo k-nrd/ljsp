@@ -1,10 +1,10 @@
-import { eva, e } from './setup'
+import { ljsp, e } from './setup'
 
 //
 // Function declaration
 //
 test('evaluate user defined function', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (begin
         (def square (x)
             (* x x))
@@ -14,7 +14,7 @@ test('evaluate user defined function', () => {
 })
 
 test('evaluate user defined function with inner block', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (begin
         (def timesTen (x)
           (begin 
@@ -26,7 +26,7 @@ test('evaluate user defined function with inner block', () => {
 })
 
 test('evaluate user defined function with closure', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (begin
         (var z 20)
         (def timesTwenty (x)
@@ -37,7 +37,7 @@ test('evaluate user defined function with closure', () => {
 })
 
 test('evaluate user defined function returns closure', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (begin
         (var val 100)
         (def calc (x y)
@@ -53,7 +53,7 @@ test('evaluate user defined function returns closure', () => {
 })
 
 test('evaluate recursive functions', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (begin
         (def factorial (x)
             (if (== x 1)

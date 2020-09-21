@@ -1,7 +1,7 @@
-import { eva, e } from './setup'
+import { ljsp, e } from './setup'
 
 test('evaluate switch expression', () => {
-  expect(eva.run(e`
+  expect(ljsp.run(e`
     (var x 10)
     (switch ((== x 10) 100)
             ((> x 10) 200)

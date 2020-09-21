@@ -1,10 +1,9 @@
-import { List, Expression } from '../lib/types'
-import { isVarName } from '../lib/type-guards'
+import { isVarName } from '../lib/expressions'
 
 class Transformer {
   // Syntactic sugar for
   // (var <name> (lambda <params> <body>))
-  defToLambda(exp: List): List {
+  defToLambda(exp) {
     const  [_, name, params, body] = exp
 
     if (!isVarName(name)) {
@@ -14,11 +13,11 @@ class Transformer {
     }
   }
 
-  switchToIf(exp: List): Expression {
+  switchToIf(exp) {
     const [_, ...cases] = exp
 
     const ifExp = ['if', null, null, null]
-    let current: List = ifExp
+    let current = ifExp
 
     for (let i = 0; i < cases.length - 1; i++) {
       const [currentCond, currentCons] = cases[i]
@@ -36,13 +35,13 @@ class Transformer {
     return ifExp
   }
 
-  whileToFor(exp: List): Expression {
+  whileToFor(exp) {
     const [_, init, cond, mod, body] = exp
 
     return ['begin', init, ['while', cond, ['begin', body, mod]], body]
   }
 
-  opToAssign(exp: List): Expression {
+  opToAssign(exp) {
     const [op, name] = exp
 
     switch (op) {

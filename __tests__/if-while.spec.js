@@ -1,4 +1,4 @@
-import { eva, e } from './setup'
+import { ljsp, e } from './setup'
 
 //
 // If block
@@ -7,7 +7,7 @@ import { eva, e } from './setup'
 //     <alternate>)
 //
 test('evaluate if block', () => {
-  expect(eva.eval(
+  expect(ljsp.evaluate(
     ['begin',
       ['var', 'x', 10],
       ['var', 'y', 0],
@@ -27,7 +27,7 @@ test('evaluate if block', () => {
 //        <block>)
 //
 test('evaluate while block', () => {
-  expect(eva.eval(
+  expect(ljsp.evaluate(
     ['begin',
       ['var', 'counter', 0],
       ['while',
@@ -45,7 +45,7 @@ test('evaluate while block', () => {
 // Tagged literal parsing
 //
 test('evaluate tagged S-expression literal', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
       (begin 
           (var counter 0)
           (while (< counter 15)

@@ -1,18 +1,15 @@
 {
-  "name": "eva-lang",
+  "name": "ljsp.js",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "scripts": {
-    "start": "rimraf dist && tsc -w",
-    "test": "jest"
-  },
   "devDependencies": {
+    "@babel/preset-env": "^7.11.5",
+    "babel-jest": "^26.3.0",
     "eslint": "^7.4.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^23.17.1",
     "jest": "^26.1.0",
-    "rimraf": "^3.0.2",
     "syntax-cli": "^0.1.13"
   }
 }

@@ -1,7 +1,7 @@
-import {eva, e} from './setup'
+import {ljsp, e} from './setup'
 
 test('evaluate module', () => {
-  expect(eva.run(e`
+  expect(ljsp.run(e`
     (module Math
         (begin
             (def abs x
@@ -19,7 +19,7 @@ test('evaluate module', () => {
 })
 
 test('assign module function to a var', () => {
-  expect(eva.run(e`
+  expect(ljsp.run(e`
     (module Math
         (begin
             (def abs x
@@ -38,7 +38,7 @@ test('assign module function to a var', () => {
 })
 
 test('assign module function to a var', () => {
-  expect(eva.run(e`
+  expect(ljsp.run(e`
     (module Math
         (begin
             (def abs x

@@ -1,11 +1,11 @@
-import { eva, e } from './setup'
+import { ljsp, e } from './setup'
 
 //
 // Block declaration
 // (begin <expressions>)
 //
 test('evaluate block declaration', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (begin
         (var x 10)
         (var y 20)
@@ -15,7 +15,7 @@ test('evaluate block declaration', () => {
 })
 
 test('evaluate nested block declaration', () => {
-  expect(eva.eval(
+  expect(ljsp.evaluate(
     ['begin',
       ['var', 'x', 10],
       ['begin',
@@ -28,7 +28,7 @@ test('evaluate nested block declaration', () => {
 })
 
 test('evaluate nested block with closure', () => {
-  expect(eva.eval(
+  expect(ljsp.evaluate(
     ['begin',
       ['var', 'y', 10],
       ['var', 'result', ['begin',

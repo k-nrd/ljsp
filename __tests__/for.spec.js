@@ -1,7 +1,7 @@
-import { eva, e } from './setup'
+import { ljsp, e } from './setup'
 
 test('evaluate for expression', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (for (var x 0)  
          (< x 10)
          (++ x)
@@ -10,7 +10,7 @@ test('evaluate for expression', () => {
 })
 
 test('evaluate for expression w/ dec', () => {
-  expect(eva.eval(e`
+  expect(ljsp.evaluate(e`
     (for (var x 10)  
          (> x 0)
          (-- x)

@@ -1,10 +1,10 @@
-import {eva, e} from './setup'
+import {ljsp, e} from './setup'
 
 //
 // Class declaration
 //
 test('evaluate user defined class', () => {
-  expect(eva.run(e`
+  expect(ljsp.run(e`
         (class Point null
             (begin
                 (def constructor (this x y)
@@ -23,7 +23,7 @@ test('evaluate user defined class', () => {
 })
 
 test('evaluate class inheritance', () => {
-  expect(eva.run(e`
+  expect(ljsp.run(e`
         (class Point null
             (begin
                 (def constructor (this x y)
